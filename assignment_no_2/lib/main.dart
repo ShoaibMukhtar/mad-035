@@ -1,17 +1,34 @@
+
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ASSIGNMENT NO 2',
+      title: 'COUNTER APP 2.0',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primaryColor: Colors.purple[900],
+        accentColor: Colors.purpleAccent,
+        backgroundColor: Colors.grey[300],
+        scaffoldBackgroundColor: Colors.lightGreen,
+        textTheme: TextTheme(
+          headline6: TextStyle(
+            color: Colors.purple[900],
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+          ),
+          bodyText2: TextStyle(
+            color: Colors.purple[900],
+            fontSize: 18.0,
+          ),
+          button: TextStyle(
+            color: Colors.red,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       home: CounterPage(),
     );
@@ -24,113 +41,96 @@ class CounterPage extends StatefulWidget {
 }
 
 class _CounterPageState extends State<CounterPage> {
-  int _counter = 0;
-  int _prevIncrementValue = 1;
+  List<int> _counters = [0, 0, 0];
+  int _currentIndex = 0;
 
-  void _incrementCounter(int value) {
+  void _decrementCounters() {
     setState(() {
-      _counter += value;
-      _prevIncrementValue = value;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Counter incremented by $value'),
-      ),
-    );
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      if (_prevIncrementValue == 1) {
-        _counter--;
-      } else if (_prevIncrementValue == 2) {
-        _counter -= 1;
-      } else if (_prevIncrementValue == 3) {
-        _counter -= 1;
+      for (int i = 0; i < _counters.length; i++) {
+        if (_counters[i] > 0) _counters[i]--;
       }
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Counter decremented by 1'),//$_prevIncrementValue
-      ),
-    );
   }
 
-  void _resetCounter() {
+  void _incrementCounters() {
     setState(() {
-      _counter = 0;
+      switch (_currentIndex) {
+        case 0:
+          _counters[_currentIndex]++;
+          break;
+        case 1:
+          _counters[_currentIndex] += 2;
+          break;
+        case 2:
+          _counters[_currentIndex] += 3;
+          break;
+      }
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Counter reset'),
-      ),
-    );
+  }
+
+  void _resetCounters() {
+    setState(() {
+      for (int i = 0; i < _counters.length; i++) {
+        _counters[i] = 0;
+      }
+    });
+  }
+
+  void _changeCounter(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('COUNTER APP 2.0'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 16),
-            Image.asset(
-              'images/flutter_logo.png',
-              width: 200,
-              height: 200,
-            ),
-            Text(
-              'Counter value:',
-              style: TextStyle(fontSize: 24),
-            ),
-            Text(
-              '$_counter',
-              style: TextStyle(fontSize: 48),
-            ),
+    List<Widget> counterTabs = [      Tab(        text: 'Counter 1',      ),      Tab(        text: 'Counter 2',      ),      Tab(        text: 'Counter 3',      ),    ];
 
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () => _incrementCounter(1),
-                  child: Text('Increment'),
+    List<Widget> counterTabViews = [      Text(        'Counter 1: ${_counters[0]}',        style: TextStyle(fontSize: 24),      ),      Text(        'Counter 2: ${_counters[1]}',        style: TextStyle(fontSize: 24),      ),      Text(        'Counter 3: ${_counters[2]}',        style: TextStyle(fontSize: 24),      ),    ];
+
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(' Counter App 2.0'),
+          bottom: TabBar(
+            tabs: counterTabs,
+            onTap: _changeCounter,
+          ),
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: TabBarView(
+                  children: counterTabViews,
                 ),
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () => _decrementCounter(),
-                  child: Text('Decrement'),
-                ),
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () => _resetCounter(),
-                  child: Text('Reset'),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                  onPressed: () => _incrementCounter(2),
-                  child: Text('Increment by 2'),
-                ),
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () => _incrementCounter(3),
-                  child: Text('Increment by 3'),
-                ),
-              ],
-            ),
-          ],
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _decrementCounters,
+                    child: Text('Decrement'),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: _incrementCounters,
+                    child: Text('Increment'),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: _resetCounters,
+                    child: Text('Reset'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-      key: Key('counterScaffold'),
     );
   }
 }
