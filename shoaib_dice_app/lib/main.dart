@@ -7,9 +7,9 @@ class DiceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shoaib Dice App',
+      title: 'Dice App',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
       home: DiceAppHomePage(),
     );
@@ -23,7 +23,6 @@ class DiceAppHomePage extends StatefulWidget {
 
 class _DiceAppHomePageState extends State<DiceAppHomePage>
     with SingleTickerProviderStateMixin {
-
   late TabController _tabController;
 
   @override
@@ -41,13 +40,13 @@ class _DiceAppHomePageState extends State<DiceAppHomePage>
           controller: _tabController,
           tabs: [
             Tab(
-              icon: Icon(Icons.looks_one),
+              text: '1 Dice',
             ),
             Tab(
-              icon: Icon(Icons.looks_two),
+              text: '2 Dices',
             ),
             Tab(
-              icon: Icon(Icons.format_list_numbered),
+              text: 'Custom Dices',
             ),
           ],
         ),
@@ -57,7 +56,7 @@ class _DiceAppHomePageState extends State<DiceAppHomePage>
         children: [
           SingleDice(),
           DoubleDice(),
-         // CustomDice(),
+          CustomDice(),
         ],
       ),
     );
@@ -147,27 +146,30 @@ class _DoubleDiceState extends State<DoubleDice> {
     );
   }
 }
+class CustomDice extends StatefulWidget {
+  @override
+  _CustomDiceState createState() => _CustomDiceState();
+}
 
-/*class _CustomDiceState extends State<CustomDice> {
+class _CustomDiceState extends State<CustomDice> {
   int _numDice = 1;
   List<int> _diceNumbers = [1];
-  List<String> _diceImages = ["assets/dice1.png"];
-
   void _rollDice() {
     List<int> newDiceNumbers = [];
-    List<String> newDiceImages = [];
     for (int i = 0; i < _numDice; i++) {
-      int number = Random().nextInt(6) + 1;
-      newDiceNumbers.add(number);
-      newDiceImages.add("assets/dice$number.png");
+      newDiceNumbers.add(Random().nextInt(6) + 1);
     }
     setState(() {
       _diceNumbers = newDiceNumbers;
-      _diceImages = newDiceImages;
     });
   }
 
-  // ...
+  void _updateNumDice(int value) {
+    setState(() {
+      _numDice = value;
+      _diceNumbers = List.generate(_numDice, (index) => 1);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,17 +179,18 @@ class _DoubleDiceState extends State<DoubleDice> {
         children: [
           Wrap(
             alignment: WrapAlignment.center,
-            children: List.generate(
-              _numDice,
-                  (index) => Padding(
+            children: _diceNumbers
+                .map(
+                  (number) => Padding(
                 padding: EdgeInsets.all(10),
                 child: Image.asset(
-                  _diceImages[index],
-                  width: 120,
-                  height: 120,
+                  'assets/dice$number.png',
+                  height: 200,
+                  width: 200,
                 ),
               ),
-            ),
+            )
+                .toList(),
           ),
           SizedBox(height: 20),
           Row(
@@ -219,4 +222,4 @@ class _DoubleDiceState extends State<DoubleDice> {
       ),
     );
   }
-}*/
+}
