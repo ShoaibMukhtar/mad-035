@@ -9,7 +9,7 @@ class DiceApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dice App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.teal,
       ),
       home: DiceAppHomePage(),
     );
@@ -51,13 +51,20 @@ class _DiceAppHomePageState extends State<DiceAppHomePage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          SingleDice(),
-          DoubleDice(),
-          CustomDice(),
-        ],
+      body: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+          image: AssetImage("assets/bg.jpg"),
+                fit: BoxFit.fill,
+        )),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            SingleDice(),
+            DoubleDice(),
+            CustomDice(),
+          ],
+        ),
       ),
     );
   }
@@ -124,10 +131,12 @@ class _DoubleDiceState extends State<DoubleDice> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Image.asset(
-                'assets/dice$_diceNumber1.png',
-                height: 200,
-                width: 200,
+              Expanded(
+                child: Image.asset(
+                  'assets/dice$_diceNumber1.png',
+                  height: 200,
+                  width: 200,
+                ),
               ),
               Image.asset(
                 'assets/dice$_diceNumber2.png',
@@ -146,6 +155,7 @@ class _DoubleDiceState extends State<DoubleDice> {
     );
   }
 }
+
 class CustomDice extends StatefulWidget {
   @override
   _CustomDiceState createState() => _CustomDiceState();
@@ -154,6 +164,7 @@ class CustomDice extends StatefulWidget {
 class _CustomDiceState extends State<CustomDice> {
   int _numDice = 1;
   List<int> _diceNumbers = [1];
+
   void _rollDice() {
     List<int> newDiceNumbers = [];
     for (int i = 0; i < _numDice; i++) {
@@ -182,14 +193,16 @@ class _CustomDiceState extends State<CustomDice> {
             children: _diceNumbers
                 .map(
                   (number) => Padding(
-                padding: EdgeInsets.all(10),
-                child: Image.asset(
-                  'assets/dice$number.png',
-                  height: 200,
-                  width: 200,
-                ),
-              ),
-            )
+                    padding: EdgeInsets.all(10),
+                    child: Expanded(
+                      child: Image.asset(
+                        'assets/dice$number.png',
+                        height: 200,
+                        width: 200,
+                      ),
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           SizedBox(height: 20),
@@ -201,10 +214,10 @@ class _CustomDiceState extends State<CustomDice> {
                 items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
                     .map(
                       (value) => DropdownMenuItem<int>(
-                    value: value,
-                    child: Text('$value'),
-                  ),
-                )
+                        value: value,
+                        child: Text('$value'),
+                      ),
+                    )
                     .toList(),
                 onChanged: (int? value) {
                   if (value != null) {
