@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-void main() => runApp(BMICalculator());
-const kactiveColor = Color(0xFF1D1E33);
-const kinactiveColor = Color(0xFF111320);
+
 const kBottomContainerHeight = 80.0;
-const kBottomContainerColour = Colors.lightGreen;
+const kActiveCardColour = Color(0xFF1D1E33);
+const kInactiveCardColour = Color(0xFF111328);
+const kBottomContainerColour = Color(0xFFEB1555);
 
-const kbottemContainerStyle = TextStyle(
-  fontSize: 30.0,
-  fontWeight: FontWeight.bold,
+const kLabelTextStyle = TextStyle(
+  fontSize: 18.0,
+  color: Color(0xFF8D8E98),
 );
 
-const kLabelStyle = TextStyle(
-  fontSize: 20.0,
-);
-const kNumberStyle = TextStyle(
+const kNumberTextStyle = TextStyle(
   fontSize: 50.0,
   fontWeight: FontWeight.w900,
+);
+
+const kLargeButtonTextStyle = TextStyle(
+  fontSize: 25.0,
+  fontWeight: FontWeight.bold,
 );
 
 const kTitleTextStyle = TextStyle(
@@ -33,11 +35,7 @@ const kBMITextStyle = TextStyle(
   fontSize: 100.0,
   fontWeight: FontWeight.bold,
 );
+
 const kBodyTextStyle = TextStyle(
   fontSize: 22.0,
-);
-
-const kLargeButtonTextStyle = TextStyle(
-  fontSize: 25.0,
-  fontWeight: FontWeight.bold,
 );
