@@ -43,9 +43,6 @@ class _DiceAppHomePageState extends State<DiceAppHomePage>
               text: '1 Dice',
             ),
             Tab(
-              text: '2 Dices',
-            ),
-            Tab(
               text: 'Custom Dices',
             ),
           ],
@@ -53,15 +50,15 @@ class _DiceAppHomePageState extends State<DiceAppHomePage>
       ),
       body: Container(
         decoration: BoxDecoration(
-            image: DecorationImage(
-          image: AssetImage("assets/bg.jpg"),
-                fit: BoxFit.fill,
-        )),
+          image: DecorationImage(
+            image: AssetImage("assets/bg.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: TabBarView(
           controller: _tabController,
           children: [
             SingleDice(),
-            DoubleDice(),
             CustomDice(),
           ],
         ),
@@ -75,13 +72,38 @@ class SingleDice extends StatefulWidget {
   _SingleDiceState createState() => _SingleDiceState();
 }
 
-class _SingleDiceState extends State<SingleDice> {
+class _SingleDiceState extends State<SingleDice>
+    with SingleTickerProviderStateMixin {
   int _diceNumber = 1;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  double _height = 100;
+  double _width = 100;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+  }
 
   void _rollDice() {
     setState(() {
       _diceNumber = Random().nextInt(6) + 1;
     });
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -90,10 +112,16 @@ class _SingleDiceState extends State<SingleDice> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/dice$_diceNumber.png',
-            height: 200,
-            width: 200,
+          AnimatedContainer(
+            duration: Duration(milliseconds: 500),
+            height: _height,
+            width: _width,
+            child: RotationTransition(
+              turns: _animation,
+              child: Image.asset(
+                'assets/dice$_diceNumber.png',
+              ),
+            ),
           ),
           SizedBox(height: 20),
           ElevatedButton(
@@ -106,64 +134,37 @@ class _SingleDiceState extends State<SingleDice> {
   }
 }
 
-class DoubleDice extends StatefulWidget {
-  @override
-  _DoubleDiceState createState() => _DoubleDiceState();
-}
-
-class _DoubleDiceState extends State<DoubleDice> {
-  int _diceNumber1 = 1;
-  int _diceNumber2 = 1;
-
-  void _rollDice() {
-    setState(() {
-      _diceNumber1 = Random().nextInt(6) + 1;
-      _diceNumber2 = Random().nextInt(6) + 1;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Image.asset(
-                  'assets/dice$_diceNumber1.png',
-                  height: 200,
-                  width: 200,
-                ),
-              ),
-              Image.asset(
-                'assets/dice$_diceNumber2.png',
-                height: 200,
-                width: 200,
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            child: Text('Roll Dice'),
-            onPressed: _rollDice,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class CustomDice extends StatefulWidget {
   @override
   _CustomDiceState createState() => _CustomDiceState();
 }
 
-class _CustomDiceState extends State<CustomDice> {
+class _CustomDiceState extends State<CustomDice>
+    with SingleTickerProviderStateMixin {
   int _numDice = 1;
   List<int> _diceNumbers = [1];
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: Offset(0.0, 0.08),
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _rollDice() {
     List<int> newDiceNumbers = [];
@@ -173,6 +174,8 @@ class _CustomDiceState extends State<CustomDice> {
     setState(() {
       _diceNumbers = newDiceNumbers;
     });
+    _controller.reset();
+    _controller.forward();
   }
 
   void _updateNumDice(int value) {
@@ -194,11 +197,12 @@ class _CustomDiceState extends State<CustomDice> {
                 .map(
                   (number) => Padding(
                     padding: EdgeInsets.all(10),
-                    child: Expanded(
+                    child: SlideTransition(
+                      position: _offsetAnimation,
                       child: Image.asset(
                         'assets/dice$number.png',
-                        height: 200,
-                        width: 200,
+                        height: 100,
+                        width: 100,
                       ),
                     ),
                   ),
@@ -215,7 +219,13 @@ class _CustomDiceState extends State<CustomDice> {
                     .map(
                       (value) => DropdownMenuItem<int>(
                         value: value,
-                        child: Text('$value'),
+                        child: Text(
+                          '$value',
+                          style: TextStyle(
+                            color: Colors.black, // Set the text color here
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
                     )
                     .toList(),

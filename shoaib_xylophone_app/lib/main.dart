@@ -1,257 +1,242 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
-  runApp(XylophoneApp());
+  runApp(MyApp());
 }
 
-class XylophoneApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: XylophonePage(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Xylophone'),
+        ),
+        body: Xylo(),
+      ),
     );
   }
 }
 
-class XylophonePage extends StatefulWidget {
+class Xylo extends StatefulWidget {
+  const Xylo({Key? key}) : super(key: key);
+
   @override
-  _XylophonePageState createState() => _XylophonePageState();
+  State<Xylo> createState() => _XyloState();
 }
 
-class _XylophonePageState extends State<XylophonePage> {
-  int _numberOfKeys = 7;
-  List<Color> _keyColors = [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.teal,
-    Colors.blue,
-    Colors.purple,
-  ];
-  List<String> _notePaths = [
-    'note1.wav',
-    'note2.wav',
-    'note3.wav',
-    'note4.wav',
-    'note5.wav',
-    'note6.wav',
-    'note7.wav',
-  ];
-  Map<String, AssetsAudioPlayer> _players = {};
+class _XyloState extends State<Xylo> {
+  int _numBars = 7;
+  List<Color> _barColors = List.filled(7, Colors.red);
 
-
-  Future<void> _initPlayers() async {
-    for (int i = 0; i < _numberOfKeys; i++) {
-      String notePath = _notePaths[i];
-      AssetsAudioPlayer player = await _loadPlayer(notePath);
-      _players[notePath] = player;
-    }
+  void playSound(int num) {
+    AssetsAudioPlayer.newPlayer()
+        .open(Audio('assets/audio/assets_note$num.wav'));
   }
 
-  Future<AssetsAudioPlayer> _loadPlayer(String notePath) async {
-    final ByteData data = await rootBundle.load('assets/audio/$_notePaths');
-    final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/$_notePaths');
-    await file.writeAsBytes(data.buffer.asUint8List(), flush: true);
-    return AssetsAudioPlayer.newPlayer()
-      ..open(
-        Audio.file(
-          file.path,
-          metas: Metas(
-            title: notePath,
-            artist: 'Xylophone App',
-            album: 'Xylophone App',
-            image: MetasImage.asset('assets/images/xylophone.png'),
-          ),
+  Expanded createNewButton(int sound, Color color) {
+    return Expanded(
+      child: Container(
+        color: color,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                playSound(sound);
+              },
+              child: Text(
+                'Button',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                _showAudioPickerDialog(sound);
+              },
+              child: Text(
+                'Choose Audio',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
-  @override
-  void initState()  {
-    super.initState();
-     _initPlayers();
+  void _showAudioPickerDialog(int sound) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick an audio file!'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note1.wav');
+                  },
+                  child: Text('Note 1'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note2.wav');
+                  },
+                  child: Text('Note 2'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note3.wav');
+                  },
+                  child: Text('Note 3'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note4.wav');
+                  },
+                  child: Text('Note 4'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note5.wav');
+                  },
+                  child: Text('Note 5'),
+                ),
+                // Add more audio options as needed
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  @override
-  void dispose() {
-    for (AssetsAudioPlayer player in _players.values) {
-      player.dispose();
+  void _pickAudioFile(int sound, String path) {
+    AssetsAudioPlayer.newPlayer().open(Audio(path));
+  }
+
+  List<Expanded> createBarButtons() {
+    List<Expanded> buttons = [];
+    for (int i = 1; i <= _numBars; i++) {
+      buttons.add(createNewButton(i, _barColors[i - 1]));
     }
-    super.dispose();
+    return buttons;
   }
 
-  void _playSound(int keyIndex) {
-    String notePath = _notePaths[keyIndex];
-    AssetsAudioPlayer player = _players[_notePaths]!;
-    player.play();
+  void changeBarColor(int index, Color color) {
+    setState(() {
+      _barColors[index] = color;
+    });
+  }
+
+  void _showColorPickerDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick a color!'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: _barColors[index],
+              onColorChanged: (Color color) {
+                changeBarColor(index, color);
+              },
+              showLabel: true,
+              pickerAreaHeightPercent: 0.8,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildNumBarsSelector() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Text('Number of Bars: '),
+        DropdownButton<int>(
+          value: _numBars,
+          onChanged: (int? value) {
+            setState(() {
+              _numBars = value!;
+            });
+          },
+          items: [
+            DropdownMenuItem<int>(
+              value: 1,
+              child: Text('1'),
+            ),
+            DropdownMenuItem<int>(
+              value: 2,
+              child: Text('2'),
+            ),
+            DropdownMenuItem<int>(
+              value: 3,
+              child: Text('3'),
+            ),
+            DropdownMenuItem<int>(
+              value: 4,
+              child: Text('4'),
+            ),
+            DropdownMenuItem<int>(
+              value: 5,
+              child: Text('5'),
+            ),
+            DropdownMenuItem<int>(
+              value: 6,
+              child: Text('6'),
+            ),
+            DropdownMenuItem<int>(
+              value: 7,
+              child: Text('7'),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Xylophone'),
-        ),
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (int i = 0; i < _numberOfKeys; i++)
-                Expanded(
-                  child: TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          _keyColors[i % _keyColors.length]),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        buildNumBarsSelector(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('Bar Colors: '),
+            ...List.generate(
+              _numBars,
+              (index) => GestureDetector(
+                onTap: () {
+                  _showColorPickerDialog(index);
+                },
+                child: Container(
+                  width: 30.0,
+                  height: 30.0,
+                  margin: EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    color: _barColors[index],
+                    border: Border.all(
+                      color: Colors.black,
                     ),
-                    onPressed: () {
-                      _playSound(i);
-                    },
-                    child: Container(),
                   ),
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
-        floatingActionButton: FloatingActionButton(onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              TextEditingController controller =
-                  TextEditingController(text: '$_numberOfKeys');
-              Color selectedColor = Colors.red;
-              String selectedNote = 'note1.wav';
-
-              return AlertDialog(
-                title: const Text('Xylophone Settings'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: controller,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Number of keys',
-                      ),
-                    ),
-                    SizedBox(height: 16.0),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Color',
-                      ),
-                      onTap: () async {
-                        Color? color = await showDialog<Color>(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text('Choose a color'),
-                              content: SingleChildScrollView(
-                                child: ColorPicker(
-                                  pickerColor: selectedColor,
-                                  onColorChanged: (color) {
-                                    selectedColor = color;
-                                  },
-                                  showLabel: true,
-                                  pickerAreaHeightPercent: 0.8,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, selectedColor);
-                                  },
-                                  child: Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                        if (color != null) {
-                          selectedColor = color;
-                        }
-                      },
-                    ),
-                    SizedBox(height: 16.0),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Audio note',
-                      ),
-                      onTap: () async {
-                        String? note = await showDialog<String>(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text('Choose an audio note'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  children: _notePaths
-                                      .map((path) => ListTile(
-                                            title: Text(path),
-                                            trailing: selectedNote == path
-                                                ? Icon(Icons.check)
-                                                : null,
-                                            onTap: () {
-                                              selectedNote = path;
-                                              Navigator.pop(
-                                                  context, selectedNote);
-                                            },
-                                          ))
-                                      .toList(),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                        if (note != null) {
-                          selectedNote = note;
-                        }
-                      },
-                    ),
-                    SizedBox(height: 16.0),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _numberOfKeys = int.parse(controller.text) + 1;
-                          _keyColors = List.generate(
-                            _numberOfKeys,
-                            (index) => index == _numberOfKeys - 1
-                                ? selectedColor
-                                : _keyColors[index % _keyColors.length],
-                          );
-                          _notePaths = List.generate(
-                            _numberOfKeys,
-                            (index) => index == _numberOfKeys - 1
-                                ? selectedNote
-                                : 'note$index.wav',
-                          );
-                          _initPlayers();
-                        });
-                        ;
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }));
+        ...createBarButtons(),
+      ],
+    );
   }
 }

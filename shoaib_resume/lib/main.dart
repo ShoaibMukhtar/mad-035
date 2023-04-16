@@ -142,7 +142,7 @@ class MyApp extends StatelessWidget {
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Dart, Java, JavaScript, Swift',
+                                  'Dart, C++',
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ),
@@ -160,7 +160,7 @@ class MyApp extends StatelessWidget {
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Flutter, React, Angular',
+                                  'Flutter, React',
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ),
@@ -178,7 +178,7 @@ class MyApp extends StatelessWidget {
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Git, AWS, Firebase, Docker',
+                                  'Git, AWS',
                                   style: TextStyle(fontSize: 16),
                                 ),
                               ),
@@ -269,7 +269,7 @@ class MyApp extends StatelessWidget {
                               Icon(Icons.star),
                               SizedBox(width: 8),
                               Text(
-                                'PRESIDENT of Gaming and Programming Society',
+                                'PRESIDENT of Gaming and \n Programming Society',
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],

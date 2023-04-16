@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "shoaib_xylophone_app" "\0"
+            VALUE "FileDescription", "soban_xylophone" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "shoaib_xylophone_app" "\0"
+            VALUE "InternalName", "soban_xylophone" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "shoaib_xylophone_app.exe" "\0"
-            VALUE "ProductName", "shoaib_xylophone_app" "\0"
+            VALUE "OriginalFilename", "soban_xylophone.exe" "\0"
+            VALUE "ProductName", "soban_xylophone" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
