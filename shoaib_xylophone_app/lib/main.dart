@@ -109,6 +109,18 @@ class _XyloState extends State<Xylo> {
                   },
                   child: Text('Note 5'),
                 ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note6.wav');
+                  },
+                  child: Text('Note 6'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _pickAudioFile(sound, 'assets/audio/assets_note7.wav');
+                  },
+                  child: Text('Note 7'),
+                ),
                 // Add more audio options as needed
               ],
             ),
