@@ -76,7 +76,6 @@ class _QuizHomePageState extends State<QuizHomePage> {
   }
 }
 
-
 class TrueFalseQuizPage extends StatefulWidget {
   @override
   _TrueFalseQuizPageState createState() => _TrueFalseQuizPageState();
@@ -88,47 +87,26 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
   bool _timerIsRunning = true;
   Timer? _timer;
 
-  List<Map<String, dynamic>> _questions = [ {
-    'question': 'Flutter uses the Dart programming language.',
-    'answer': true,
-  },
+  List<Map<String, dynamic>> _questions = [
     {
-      'question': 'Flutter apps can only be developed on macOS.',
-      'answer': false,
-    },
-    {
-      'question': 'Flutter provides a rich set of pre-built widgets.',
+      'question': 'Flutter uses the Dart programming language.',
       'answer': true,
     },
     {
-      'question': 'Flutter is a hybrid app development framework.',
-      'answer': false,
-    },
-    {
-      'question': 'Flutter has native support for hot-reload.',
+      'question': 'The "main" function is the entry point of a Flutter app.',
       'answer': true,
     },
     {
-      'question': 'Flutter apps can only be deployed on the Google Play Store.',
+      'question': 'Widgets in Flutter are immutable.',
       'answer': false,
     },
     {
-      'question': 'Flutter provides built-in support for unit testing.',
-      'answer': true,
-    },
-    {
-      'question': 'Flutter is a popular choice for developing web apps.',
-      'answer': false,
-    },
-    {
-      'question': 'Flutter can be used to develop desktop apps.',
-      'answer': true,
-    },
-    {
-      'question': 'Flutter is a free and open-source software development kit.',
+      'question': 'Flutter was developed by Google.',
       'answer': true,
     },
   ];
+
+  List<bool> _attemptedQuestions = [false, false, false, false];
 
   @override
   void initState() {
@@ -150,6 +128,32 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
     super.dispose();
   }
 
+  void _onAnswerSelected(bool answer) {
+    if (_questions[_currentQuestionIndex]['answer'] == answer) {
+      _score++;
+    }
+    _attemptedQuestions[_currentQuestionIndex] = true;
+    setState(() {
+      _currentQuestionIndex++;
+    });
+  }
+
+  void _onPreviousQuestion() {
+    if (_currentQuestionIndex > 0) {
+      setState(() {
+        _currentQuestionIndex--;
+      });
+    }
+  }
+
+  void _onNextQuestion() {
+    if (_currentQuestionIndex < _questions.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_currentQuestionIndex >= _questions.length) {
@@ -167,13 +171,11 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
                 ),
               ),
               child: Center(
-                child: Text('Your score is $_score', style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24),
+                child: Text(
+                  'Your score is $_score',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
-              )
-          )
-      );
+              )));
     }
 
     return Scaffold(
@@ -191,11 +193,28 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(
-                'Question ${_currentQuestionIndex +
-                    1}: ${_questions[_currentQuestionIndex]['question']}',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, color: Colors.white,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      child: Text('Prev'),
+                      onPressed: () {
+                        _onPreviousQuestion();
+                      },
+                    ),
+                    Text(
+                      'Question ${_currentQuestionIndex + 1}: ${_questions[_currentQuestionIndex]['question']}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    ElevatedButton(
+                      child: Text('Next'),
+                      onPressed: () {
+                        _onNextQuestion();
+                      },
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 30),
@@ -203,14 +222,7 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
                 height: 30,
                 child: ElevatedButton(
                   child: Text('True'),
-                  onPressed: () {
-                    if (_questions[_currentQuestionIndex]['answer'] == true) {
-                      _score++;
-                    }
-                    setState(() {
-                      _currentQuestionIndex++;
-                    });
-                  },
+                  onPressed: () => _onAnswerSelected(true),
                 ),
               ),
               SizedBox(height: 30),
@@ -218,14 +230,7 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
                 height: 30,
                 child: ElevatedButton(
                   child: Text('False'),
-                  onPressed: () {
-                    if (_questions[_currentQuestionIndex]['answer'] == false) {
-                      _score++;
-                    }
-                    setState(() {
-                      _currentQuestionIndex++;
-                    });
-                  },
+                  onPressed: () => _onAnswerSelected(false),
                 ),
               ),
               SizedBox(height: 20),
@@ -233,7 +238,45 @@ class _TrueFalseQuizPageState extends State<TrueFalseQuizPage> {
                 'Time: ${_timer?.tick ?? 0} seconds',
                 style: TextStyle(fontSize: 18),
               ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _questions.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _buildQuestionIndicator(index),
+                  ),
+                ),
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionIndicator(int index) {
+    bool isAnswered = index < _currentQuestionIndex;
+    IconData iconData = isAnswered ? Icons.check : Icons.close;
+    Color color = isAnswered ? Colors.green : Colors.red;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentQuestionIndex = index;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isAnswered ? color.withOpacity(0.5) : null,
+          shape: BoxShape.circle,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            iconData,
+            color: isAnswered ? color : Colors.white,
+            size: 20,
           ),
         ),
       ),
@@ -263,87 +306,6 @@ class _McqQuizPageState extends State<McqQuizPage> {
       ],
       'answer': 'A programming language',
     },
-    {
-      'question': 'What is Dart?',
-      'options': [
-        'A type of bird',
-        'A type of drink',
-        'A programming language',
-        'A type of dance'
-      ],
-      'answer': 'A type of bird',
-    },
-    {
-      'question': 'What is a widget in Flutter?',
-      'options': [
-        'A type of plant',
-        'A user interface element',
-        'A type of animal',
-        'A type of mineral'
-      ],
-      'answer': 'A user interface element',
-    },
-    {
-      'question': 'What is hot-reload in Flutter?',
-      'options': [
-        'A type of coffee',
-        'A feature for fast development',
-        'A type of car',
-        'A type of food'
-      ],
-      'answer': 'A feature for fast development',
-    },
-    {
-      'question': 'What is a scaffold in Flutter?',
-      'options': [
-        'A type of tool',
-        'A user interface element',
-        'A type of building',
-        'A type of bird'
-      ],
-      'answer': 1,
-    },
-    {
-      'question': 'What is a stateful widget in Flutter?',
-      'options': [
-        'A widget that can change',
-        'A widget that cannot change',
-        'A type of bird',
-        'A type of plant'
-      ],
-      'answer': 'A widget that can change',
-    },
-    {
-      'question': 'What is a future in Dart?',
-      'options': [
-        'A type of event',
-        'A type of plant',
-        'A type of bird',
-        'A type of asynchronous operation'
-      ],
-      'answer': 'A type of event',
-    },
-    {
-      'question': 'What is an async function in Dart?',
-      'options': [
-        'A function that runs synchronously',
-        'A function that runs asynchronously',
-        'A type of bird',
-        'A type of plant'
-      ],
-      'answer': 'A function that runs synchronously',
-    },
-    {
-      'question': 'What is a stream in Dart?',
-      'options': [
-        'A type of water',
-        'A type of event',
-        'A type of plant',
-        'A type of bird'
-      ],
-      'answer': 'A type of event',
-    },
-
   ];
 
   @override
@@ -394,8 +356,8 @@ class _McqQuizPageState extends State<McqQuizPage> {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(
-              "assets/quiz.jpg"), // replace with your own image path
+          image:
+              AssetImage("assets/quiz.jpg"), // replace with your own image path
           fit: BoxFit.cover,
         ),
       ),
@@ -410,15 +372,16 @@ class _McqQuizPageState extends State<McqQuizPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                'Question ${_currentQuestionIndex +
-                    1}: ${_questions[_currentQuestionIndex]['question']}',
+                'Question ${_currentQuestionIndex + 1}: ${_questions[_currentQuestionIndex]['question']}',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, color: Colors.white,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
                 ),
-
               ),
               SizedBox(height: 20),
-              for (String option in _questions[_currentQuestionIndex]['options'])
+              for (String option in _questions[_currentQuestionIndex]
+                  ['options'])
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
