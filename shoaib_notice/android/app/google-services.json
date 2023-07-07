@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "22557406275",
+    "project_id": "shoaib-1292c",
+    "storage_bucket": "shoaib-1292c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:22557406275:android:9b65ce55ea25b3780410f6",
+        "android_client_info": {
+          "package_name": "com.example.shoaib_notice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "22557406275-bok3dihhl7utbtu2smdceceo4ms02ilj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBProlfHfNA056XvvBbaNztEx9l31l6QA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "22557406275-bok3dihhl7utbtu2smdceceo4ms02ilj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
